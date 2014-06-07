@@ -6,32 +6,41 @@
     var isDragging = false;
     var dragStart = {};
     var dragTarget;
+    var hoverEdge = null;
     $('#c').mousemove( function(e) {
       if ($(e.target).width() - e.offsetX < 5) {
         $(e.target).css('cursor', 'col-resize');
+        if (!isDragging) { hoverEdge = "right"; }
       } else if ($(e.target).height() - e.offsetY < 5) {
         $(e.target).css('cursor', 'row-resize');
+        if (!isDragging) { hoverEdge = "bottom"; }
       } else {
         $(e.target).css('cursor', '');
+        if (!isDragging) { hoverEdge = null; }
       }
     })
     .mousedown(function(e) { // need to mix in edge detect
-      console.log("down");
-      isDragging = true;
-      dragTarget = $(e.target);
-      $(window).mousemove(function(e) {
-        var dragEnd = {pageX: e.pageX, pageY: e.pageY}
-        //if dragging right/left && diff is not negative
-        if (dragStart.pageX) {
-          // console.log("moving: " + dragTarget.width() + " + " + dragEnd.pageX + " - " + dragStart.pageX);
-          dragTarget.width(dragTarget.width() + dragEnd.pageX - dragStart.pageX);
-        }
-        dragStart = dragEnd;
-      });
+      if (hoverEdge) {
+        console.log("down");
+        dragTarget = $(e.target);
+        isDragging = true;
+        $(window).mousemove(function(e) {
+          var dragEnd = {pageX: e.pageX, pageY: e.pageY}
+          if (!$.isEmptyObject(dragStart)) {
+            if (hoverEdge === "right") {
+              dragTarget.width(dragTarget.width() + dragEnd.pageX - dragStart.pageX);
+            } else {
+              dragTarget.height(dragTarget.height() + dragEnd.pageY - dragStart.pageY);
+            }
+          }
+          dragStart = dragEnd;
+        });
+      }
     })
     .mouseup(function() {
       console.log("up");
       isDragging = false;
+      dragStart = {};
       $(window).unbind("mousemove");
     });
   });
