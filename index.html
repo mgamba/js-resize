@@ -1,0 +1,73 @@
+<html>
+<head>
+<script src="jquery-2.1.1.min.js"></script>
+<script>
+  $( document ).ready(function() {
+    var isDragging = false;
+    var dragStart = {};
+    $('#c').mousemove( function(e) {
+      if ($(e.target).width() - e.offsetX < 5) {
+        $(e.target).css('cursor', 'col-resize');
+      } else if ($(e.target).height() - e.offsetY < 5) {
+        $(e.target).css('cursor', 'row-resize');
+      } else {
+        $(e.target).css('cursor', '');
+      }
+    })
+    .mousedown(function(e) { // need to mix in edge detect
+      console.log("down");
+      var wasDragging = isDragging;
+      isDragging = true;
+      $(window).mousemove(function(e) {
+        console.log("moving");
+        var dragEnd = {pageX: e.pageX, pageY: e.pageY}
+        if (wasDragging) {
+          console.log("resizing");
+          //if dragging right/left && diff is not negative
+          $(e.target).width($(e.target).width() + dragEnd.pageX - dragStart.pageX);
+        }
+        dragStart = dragEnd;
+      });
+    })
+    .mouseup(function() {
+      console.log("up");
+      isDragging = false;
+      $(window).unbind("mousemove");
+    });
+  });
+</script>
+<style>
+  #a {
+    background-color: gray;
+    height: 300px;
+    width: 500px;
+    padding: 30px;
+  }
+  #b {
+    background-color: white;
+    border: dashed 1px black;
+    height: 100px;
+    width: 100px;
+    position: absolute;
+    left: 50px;
+    right: 50px;
+  }
+  #c {
+    background-color: black;
+    border: dashed 1px white;
+    color: white;
+    height: 100px;
+    width: 100px;
+    position: absolute;
+    left: 200px;
+    right: 50px;
+  }
+</style>
+</head>
+<body>
+<div id="a">a
+  <div id="b">b</div>
+  <div id="c">c</div>
+</div>
+</body>
+</html>
