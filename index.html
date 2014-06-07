@@ -9,10 +9,15 @@
     var hoverEdge = null;
     $('#c').mousemove( function(e) {
       if ($(e.target).width() - e.offsetX < 5) {
-        $(e.target).css('cursor', 'col-resize');
-        if (!isDragging) { hoverEdge = "right"; }
+        if ($(e.target).height() - e.offsetY < 5) {
+          $(e.target).css('cursor', 'se-resize');
+          if (!isDragging) { hoverEdge = "corner"; }
+        } else {
+          $(e.target).css('cursor', 'e-resize');
+          if (!isDragging) { hoverEdge = "right"; }
+        }
       } else if ($(e.target).height() - e.offsetY < 5) {
-        $(e.target).css('cursor', 'row-resize');
+        $(e.target).css('cursor', 's-resize');
         if (!isDragging) { hoverEdge = "bottom"; }
       } else {
         $(e.target).css('cursor', '');
@@ -27,9 +32,10 @@
         $(window).mousemove(function(e) {
           var dragEnd = {pageX: e.pageX, pageY: e.pageY}
           if (!$.isEmptyObject(dragStart)) {
-            if (hoverEdge === "right") {
+            if (hoverEdge === "right" || hoverEdge === "corner") {
               dragTarget.width(dragTarget.width() + dragEnd.pageX - dragStart.pageX);
-            } else {
+            }
+            if (hoverEdge === "bottom" || hoverEdge === "corner") {
               dragTarget.height(dragTarget.height() + dragEnd.pageY - dragStart.pageY);
             }
           }
