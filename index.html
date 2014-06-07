@@ -5,6 +5,7 @@
   $( document ).ready(function() {
     var isDragging = false;
     var dragStart = {};
+    var dragTarget;
     $('#c').mousemove( function(e) {
       if ($(e.target).width() - e.offsetX < 5) {
         $(e.target).css('cursor', 'col-resize');
@@ -16,15 +17,14 @@
     })
     .mousedown(function(e) { // need to mix in edge detect
       console.log("down");
-      var wasDragging = isDragging;
       isDragging = true;
+      dragTarget = $(e.target);
       $(window).mousemove(function(e) {
-        console.log("moving");
         var dragEnd = {pageX: e.pageX, pageY: e.pageY}
-        if (wasDragging) {
-          console.log("resizing");
-          //if dragging right/left && diff is not negative
-          $(e.target).width($(e.target).width() + dragEnd.pageX - dragStart.pageX);
+        //if dragging right/left && diff is not negative
+        if (dragStart.pageX) {
+          // console.log("moving: " + dragTarget.width() + " + " + dragEnd.pageX + " - " + dragStart.pageX);
+          dragTarget.width(dragTarget.width() + dragEnd.pageX - dragStart.pageX);
         }
         dragStart = dragEnd;
       });
