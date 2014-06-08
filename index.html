@@ -4,7 +4,7 @@
 <script>
   $( document ).ready(function() {
     var isDragging = false;
-    var dragStart = {};
+    var currentCoords = {};
     var dragTarget;
     var hoverEdge = null;
     var hoverBehavior = function(e) {
@@ -25,29 +25,32 @@
       }
     }
     var dragBehavior = function(e) {
-      var dragEnd = {pageX: e.pageX, pageY: e.pageY}
-      if (!$.isEmptyObject(dragStart)) {
+      var nextCoords = {pageX: e.pageX, pageY: e.pageY}
+      if (!$.isEmptyObject(currentCoords)) {
         if (hoverEdge === "right" || hoverEdge === "corner") {
-          dragTarget.width(dragTarget.width() + dragEnd.pageX - dragStart.pageX);
+          dragTarget.width(dragTarget.width() + nextCoords.pageX - currentCoords.pageX);
         }
         if (hoverEdge === "bottom" || hoverEdge === "corner") {
-          dragTarget.height(dragTarget.height() + dragEnd.pageY - dragStart.pageY);
+          dragTarget.height(dragTarget.height() + nextCoords.pageY - currentCoords.pageY);
         }
       }
-      dragStart = dragEnd;
+      currentCoords = nextCoords;
+      $('#dragResizeLabel').html(dragTarget.width() + "x" + dragTarget.height());
     }
     $(window).mousemove( function(e){ hoverBehavior(e); } )
-    .mousedown(function(e) { // need to mix in edge detect
+    .mousedown(function(e) {
       if (hoverEdge) {
         dragTarget = $(e.target);
+        $('<div/>', {id: 'dragResizeLabel'}).appendTo(e.target);
         isDragging = true;
         $(window).unbind("mousemove");
         $(window).mousemove( function(e){ dragBehavior(e); } );
       }
     })
-    .mouseup(function() {
+    .mouseup(function(e) {
       isDragging = false;
-      dragStart = {};
+      currentCoords = {};
+      $('#dragResizeLabel').remove();
       $(window).unbind("mousemove");
       $(window).mousemove( function(e){ hoverBehavior(e); } );
     });
@@ -78,6 +81,14 @@
     position: absolute;
     left: 200px;
     right: 50px;
+  }
+  #dragResizeLabel {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background-color: gray;
+    border: solid 1px white;
+    color: black;
   }
 </style>
 </head>
