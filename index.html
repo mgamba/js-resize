@@ -7,7 +7,7 @@
     var dragStart = {};
     var dragTarget;
     var hoverEdge = null;
-    $('#c').mousemove( function(e) {
+    var hoverBehavior = function(e) {
       if ($(e.target).width() - e.offsetX < 5) {
         if ($(e.target).height() - e.offsetY < 5) {
           $(e.target).css('cursor', 'se-resize');
@@ -23,31 +23,33 @@
         $(e.target).css('cursor', '');
         if (!isDragging) { hoverEdge = null; }
       }
-    })
+    }
+    var dragBehavior = function(e) {
+      var dragEnd = {pageX: e.pageX, pageY: e.pageY}
+      if (!$.isEmptyObject(dragStart)) {
+        if (hoverEdge === "right" || hoverEdge === "corner") {
+          dragTarget.width(dragTarget.width() + dragEnd.pageX - dragStart.pageX);
+        }
+        if (hoverEdge === "bottom" || hoverEdge === "corner") {
+          dragTarget.height(dragTarget.height() + dragEnd.pageY - dragStart.pageY);
+        }
+      }
+      dragStart = dragEnd;
+    }
+    $(window).mousemove( function(e){ hoverBehavior(e); } )
     .mousedown(function(e) { // need to mix in edge detect
       if (hoverEdge) {
-        console.log("down");
         dragTarget = $(e.target);
         isDragging = true;
-        $(window).mousemove(function(e) {
-          var dragEnd = {pageX: e.pageX, pageY: e.pageY}
-          if (!$.isEmptyObject(dragStart)) {
-            if (hoverEdge === "right" || hoverEdge === "corner") {
-              dragTarget.width(dragTarget.width() + dragEnd.pageX - dragStart.pageX);
-            }
-            if (hoverEdge === "bottom" || hoverEdge === "corner") {
-              dragTarget.height(dragTarget.height() + dragEnd.pageY - dragStart.pageY);
-            }
-          }
-          dragStart = dragEnd;
-        });
+        $(window).unbind("mousemove");
+        $(window).mousemove( function(e){ dragBehavior(e); } );
       }
     })
     .mouseup(function() {
-      console.log("up");
       isDragging = false;
       dragStart = {};
       $(window).unbind("mousemove");
+      $(window).mousemove( function(e){ hoverBehavior(e); } );
     });
   });
 </script>
